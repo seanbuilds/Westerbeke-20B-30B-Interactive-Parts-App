@@ -16,7 +16,7 @@ const CHROME = "#e2e6eb";
 const BRASS = "#c59b4e";
 const COPPER = "#b85d38";
 const RUBBER = "#1a1b1d";
-const GREEN_HOSE = "#10a356";
+const GREEN_HOSE = "#15a85c";
 const RACOR_BLUE = "#1a2a48";
 const BOWL_TINT = "#5a6848";
 
@@ -142,7 +142,6 @@ function tube(points: [number, number, number][], radius = 0.014, closed = false
 // Realistic 3D Hydrofoil Marine Propeller Blade Shape Generator
 function createPropellerBladeGeometry(diameter = 0.36, hubRadius = 0.042) {
   const shape = new THREE.Shape();
-  // Expanded-area hydrofoil outline from root to tip
   const rRoot = hubRadius * 0.95;
   const rTip = diameter / 2;
   const length = rTip - rRoot;
@@ -171,10 +170,8 @@ function createPropellerBladeGeometry(diameter = 0.36, hubRadius = 0.042) {
     const y = pos.getY(i);
     const z = pos.getZ(i);
     const x = pos.getX(i);
-    // Pitch angle decreases from 35 deg at root to 20 deg at tip
     const progress = Math.min(Math.max(y / length, 0), 1);
     const pitchAngle = (32 - progress * 14) * (Math.PI / 180);
-    // Twist in Y-Z plane
     const cosP = Math.cos(pitchAngle);
     const sinP = Math.sin(pitchAngle);
     const newX = x * cosP - z * sinP;
@@ -191,14 +188,15 @@ export function EngineModel() {
   // Precomputed Propeller Blade Geometry
   const propBladeGeom = useMemo(() => createPropellerBladeGeometry(0.36, 0.042), []);
 
-  // 1. High Pressure Injector Lines (from pump delivery valves at [0.42, 0.16, z] to injector bodies at [0.25, 0.48, z])
+  // ===================== PORT SIDE FUEL LINES (X < 0) =====================
+  // 1. High Pressure Injector Lines (from pump delivery valves at [-0.42, 0.16, z] up to injector bodies at [-0.25, 0.48, z])
   const hp1 = useMemo(
     () =>
       tube([
-        [0.42, 0.16, -0.12],
-        [0.38, 0.32, -0.16],
-        [0.30, 0.44, -0.22],
-        [0.25, 0.48, -0.24],
+        [-0.42, 0.16, -0.12],
+        [-0.38, 0.32, -0.16],
+        [-0.30, 0.44, -0.22],
+        [-0.25, 0.48, -0.24],
       ], 0.007),
     [],
   );
@@ -206,10 +204,10 @@ export function EngineModel() {
   const hp2 = useMemo(
     () =>
       tube([
-        [0.42, 0.16, 0.04],
-        [0.36, 0.32, 0.04],
-        [0.29, 0.44, 0.04],
-        [0.25, 0.48, 0.04],
+        [-0.42, 0.16, 0.04],
+        [-0.36, 0.32, 0.04],
+        [-0.29, 0.44, 0.04],
+        [-0.25, 0.48, 0.04],
       ], 0.007),
     [],
   );
@@ -217,23 +215,23 @@ export function EngineModel() {
   const hp3 = useMemo(
     () =>
       tube([
-        [0.42, 0.16, 0.20],
-        [0.38, 0.32, 0.22],
-        [0.30, 0.44, 0.23],
-        [0.25, 0.48, 0.24],
+        [-0.42, 0.16, 0.20],
+        [-0.38, 0.32, 0.22],
+        [-0.30, 0.44, 0.23],
+        [-0.25, 0.48, 0.24],
       ], 0.007),
     [],
   );
 
-  // 2. Focus Green Injector Return Hose 036868 (from injector leak-off at [0.26, 0.56, -0.24] down to pump return barb [0.44, 0.16, 0.08])
+  // 2. Focus Green Injector Return Hose 036868 (from injector leak-off at [-0.26, 0.56, -0.24] arching down to pump return barb [-0.44, 0.16, 0.08])
   const returnHoseTube = useMemo(
     () =>
       tube([
-        [0.26, 0.56, -0.24],
-        [0.30, 0.52, -0.12],
-        [0.36, 0.44, 0.0],
-        [0.42, 0.30, 0.06],
-        [0.44, 0.16, 0.08],
+        [-0.26, 0.56, -0.24],
+        [-0.30, 0.52, -0.12],
+        [-0.36, 0.44, 0.0],
+        [-0.42, 0.30, 0.06],
+        [-0.44, 0.16, 0.08],
       ], 0.010),
     [],
   );
@@ -242,9 +240,9 @@ export function EngineModel() {
   const fuelReturn2 = useMemo(
     () =>
       tube([
-        [0.44, 0.14, 0.08],
-        [0.48, 0.10, -0.06],
-        [0.46, 0.04, -0.22],
+        [-0.44, 0.14, 0.08],
+        [-0.48, 0.10, -0.06],
+        [-0.46, 0.04, -0.22],
       ], 0.009),
     [],
   );
@@ -252,20 +250,20 @@ export function EngineModel() {
   const fuelReturn3 = useMemo(
     () =>
       tube([
-        [0.44, 0.14, 0.08],
-        [0.50, 0.08, 0.16],
-        [0.54, 0.02, 0.24],
+        [-0.44, 0.14, 0.08],
+        [-0.50, 0.08, 0.16],
+        [-0.54, 0.02, 0.24],
       ], 0.009),
     [],
   );
 
-  // 4. Fuel Supply Lines (Scale-proportional 5/16" and 3/8" lines)
+  // 4. Fuel Supply Lines (5/16" and 3/8" lines on Port side)
   const hoseFuelSupply = useMemo(
     () =>
       tube([
-        [0.56, 0.30, 0.36],
-        [0.54, 0.12, 0.36],
-        [0.50, -0.08, 0.36],
+        [-0.56, 0.30, 0.36],
+        [-0.54, 0.12, 0.36],
+        [-0.50, -0.08, 0.36],
       ], 0.010),
     [],
   );
@@ -273,10 +271,10 @@ export function EngineModel() {
   const hoseLiftToFilter = useMemo(
     () =>
       tube([
-        [0.50, -0.05, 0.36],
-        [0.52, 0.06, 0.18],
-        [0.50, 0.14, -0.05],
-        [0.46, 0.18, -0.18],
+        [-0.50, -0.05, 0.36],
+        [-0.52, 0.06, 0.18],
+        [-0.50, 0.14, -0.05],
+        [-0.46, 0.18, -0.18],
       ], 0.009),
     [],
   );
@@ -284,89 +282,90 @@ export function EngineModel() {
   const hoseFilterToInj = useMemo(
     () =>
       tube([
-        [0.46, 0.14, -0.20],
-        [0.45, 0.08, -0.12],
-        [0.44, 0.06, -0.02],
+        [-0.46, 0.14, -0.20],
+        [-0.45, 0.08, -0.12],
+        [-0.44, 0.06, -0.02],
       ], 0.009),
     [],
   );
 
-  // 5. Cooling Hoses
-  // Sea pump top outlet [0.26, 0.01, 0.72] to heat exchanger inlet [0.26, 0.72, 0.22]
+  // ===================== STARBOARD COOLING HOSES (X > 0) =====================
+  // Sea pump top outlet [-0.26, 0.01, 0.72] around front timing cover over to heat exchanger front inlet [0.46, 0.55, 0.41]
   const hoseSeaToHeatex = useMemo(
     () =>
       tube([
-        [0.26, 0.01, 0.72],
-        [0.28, 0.28, 0.62],
-        [0.28, 0.52, 0.44],
-        [0.26, 0.72, 0.22],
-      ], 0.018),
+        [-0.26, 0.01, 0.72],
+        [-0.15, 0.18, 0.74],
+        [0.10, 0.36, 0.72],
+        [0.32, 0.48, 0.58],
+        [0.46, 0.55, 0.41],
+      ], 0.016),
     [],
   );
 
-  // Thermostat cover [-0.36, 0.52, 0.40] to manifold [-0.46, 0.42, 0.18]
+  // Thermostat cover [0.36, 0.52, 0.40] to manifold [0.46, 0.42, 0.18]
   const hoseThermoManifold = useMemo(
     () =>
       tube([
-        [-0.36, 0.52, 0.40],
-        [-0.42, 0.46, 0.30],
-        [-0.46, 0.42, 0.18],
-      ], 0.018),
+        [0.36, 0.52, 0.40],
+        [0.42, 0.46, 0.30],
+        [0.46, 0.42, 0.18],
+      ], 0.016),
     [],
   );
 
-  // Heat exchanger bottom [-0.24, 0.66, 0.2] to circulating water pump [-0.06, 0.26, 0.66]
+  // Heat exchanger bottom [0.46, 0.55, 0.20] to circulating water pump [0.06, 0.26, 0.66]
   const hoseFwToHeatex = useMemo(
     () =>
       tube([
-        [-0.24, 0.66, 0.20],
-        [-0.18, 0.52, 0.38],
-        [-0.12, 0.38, 0.52],
-        [-0.06, 0.26, 0.66],
-      ], 0.020),
+        [0.46, 0.55, 0.20],
+        [0.36, 0.44, 0.42],
+        [0.22, 0.35, 0.56],
+        [0.06, 0.26, 0.66],
+      ], 0.018),
     [],
   );
 
   const hoseFlowCtrl1 = useMemo(
     () =>
       tube([
-        [-0.28, 0.34, 0.46],
-        [-0.30, 0.28, 0.42],
-        [-0.32, 0.24, 0.38],
-      ], 0.010),
+        [0.46, 0.34, 0.35],
+        [0.48, 0.28, 0.30],
+        [0.50, 0.24, 0.25],
+      ], 0.009),
     [],
   );
 
   const hoseFlowCtrl2 = useMemo(
     () =>
       tube([
-        [-0.32, 0.24, 0.38],
-        [-0.34, 0.18, 0.32],
-        [-0.35, 0.12, 0.26],
-      ], 0.010),
+        [0.50, 0.24, 0.25],
+        [0.48, 0.18, 0.20],
+        [0.46, 0.12, 0.15],
+      ], 0.009),
     [],
   );
 
-  // Sump remote drain from banjo [0.28, -0.38, 0.1] to bracket [0.44, -0.32, 0.32]
+  // Sump remote drain from banjo [-0.28, -0.38, 0.1] to port bracket [-0.44, -0.32, 0.32]
   const hoseSumpDrain = useMemo(
     () =>
       tube([
-        [0.28, -0.38, 0.10],
-        [0.34, -0.40, 0.16],
-        [0.40, -0.36, 0.24],
-        [0.44, -0.32, 0.32],
+        [-0.28, -0.38, 0.10],
+        [-0.34, -0.40, 0.16],
+        [-0.40, -0.36, 0.24],
+        [-0.44, -0.32, 0.32],
       ], 0.013),
     [],
   );
 
-  // Transmission cooler lines: Exchanger [-0.34, 0.72, -0.05] -> Cooler [-0.34, -0.04, -0.80] -> Mixing elbow [-0.55, 0.22, -0.56]
+  // Transmission cooler lines: Exchanger [0.46, 0.55, -0.33] -> Cooler [0.34, -0.04, -0.80] -> Mixing elbow [0.55, 0.22, -0.56]
   const hoseTransCooler1 = useMemo(
     () =>
       tube([
-        [-0.34, 0.72, -0.05],
-        [-0.40, 0.35, -0.40],
-        [-0.40, 0.10, -0.70],
-        [-0.34, -0.04, -0.80],
+        [0.46, 0.55, -0.33],
+        [0.42, 0.30, -0.55],
+        [0.38, 0.10, -0.72],
+        [0.34, -0.04, -0.80],
       ], 0.013),
     [],
   );
@@ -374,43 +373,44 @@ export function EngineModel() {
   const hoseTransCooler2 = useMemo(
     () =>
       tube([
-        [-0.34, -0.04, -1.04],
-        [-0.48, 0.08, -0.85],
-        [-0.52, 0.16, -0.68],
-        [-0.55, 0.22, -0.56],
+        [0.34, -0.04, -1.04],
+        [0.45, 0.06, -0.85],
+        [0.50, 0.14, -0.68],
+        [0.55, 0.22, -0.56],
       ], 0.013),
     [],
   );
 
-  // Overflow from pressure cap [0.02, 0.76, 0.12] to bottle [0.56, 0.16, 0.52]
+  // Overflow from pressure cap [0.46, 0.70, 0.37] over the top cover to port coolant bottle [-0.56, 0.16, 0.52]
   const hoseCoolantOverflow = useMemo(
     () =>
       tube([
-        [0.02, 0.76, 0.12],
-        [0.20, 0.55, 0.28],
-        [0.40, 0.35, 0.40],
-        [0.56, 0.16, 0.52],
+        [0.43, 0.70, 0.37],
+        [0.25, 0.68, 0.40],
+        [0.0, 0.65, 0.44],
+        [-0.30, 0.45, 0.48],
+        [-0.56, 0.16, 0.52],
       ], 0.007),
     [],
   );
 
-  // 6. Realistic 3-Point V-Belt Path around Crank Pulley, Water Pump Pulley, and Alternator Pulley at Z = 0.72
+  // 6. Realistic 3-Point V-Belt Path around Crank Pulley [0, 0.02, 0.72], Water Pump Pulley [0.06, 0.30, 0.72], and Alternator Pulley [-0.44, 0.16, 0.72]
   const vBeltLoop = useMemo(
     () =>
       tube(
         [
           [0.0, -0.12, 0.72],
-          [-0.14, 0.02, 0.72],
-          [-0.14, 0.22, 0.72],
-          [-0.12, 0.36, 0.72],
-          [-0.06, 0.38, 0.72],
-          [0.02, 0.34, 0.72],
-          [0.20, 0.26, 0.72],
-          [0.38, 0.20, 0.72],
-          [0.48, 0.16, 0.72],
-          [0.46, 0.11, 0.72],
-          [0.28, 0.04, 0.72],
-          [0.14, -0.04, 0.72],
+          [0.14, 0.02, 0.72],
+          [0.14, 0.22, 0.72],
+          [0.12, 0.36, 0.72],
+          [0.06, 0.38, 0.72],
+          [-0.02, 0.34, 0.72],
+          [-0.20, 0.26, 0.72],
+          [-0.38, 0.20, 0.72],
+          [-0.48, 0.16, 0.72],
+          [-0.46, 0.11, 0.72],
+          [-0.28, 0.04, 0.72],
+          [-0.14, -0.04, 0.72],
         ],
         0.009,
         true,
@@ -548,21 +548,21 @@ export function EngineModel() {
         )}
       </PartNode>
 
-      {/* ==================== 7. EXHAUST MANIFOLD ==================== */}
+      {/* ==================== 7. EXHAUST MANIFOLD (STARBOARD X > 0) ==================== */}
       <PartNode id="manifold">
         <mesh castShadow>
           <boxGeometry args={[0.22, 0.2, 1.05]} />
           <Mat color={PAINT} />
         </mesh>
-        {/* Runners to head ports */}
+        {/* Runners from manifold inward (-X) into head ports */}
         {[-0.32, 0, 0.32].map((z) => (
-          <mesh key={z} position={[0.12, -0.02, z]} rotation={[0, 0, Math.PI / 2]}>
+          <mesh key={z} position={[-0.12, -0.02, z]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.045, 0.045, 0.08, 14]} />
             <Mat color={IRON} />
           </mesh>
         ))}
-        {/* Serial plate */}
-        <mesh position={[-0.115, 0.04, 0.1]} rotation={[0, -Math.PI / 2, 0]}>
+        {/* Serial plate facing outward (+X) to Starboard */}
+        <mesh position={[0.115, 0.04, 0.1]} rotation={[0, Math.PI / 2, 0]}>
           <planeGeometry args={[0.18, 0.07]} />
           <Mat color="#e5c878" metalness={0.8} roughness={0.3} />
         </mesh>
@@ -602,17 +602,17 @@ export function EngineModel() {
         ))}
       </PartNode>
 
-      {/* ==================== 9. WET EXHAUST MIXING ELBOW ==================== */}
+      {/* ==================== 9. WET EXHAUST MIXING ELBOW (STARBOARD AFT) ==================== */}
       <PartNode id="wet-exhaust">
-        <mesh castShadow rotation={[0, 0, Math.PI / 2]}>
+        <mesh castShadow rotation={[0, 0, -Math.PI / 2]}>
           <torusGeometry args={[0.14, 0.07, 12, 16, Math.PI / 1.3]} />
           <Mat color={IRON} metalness={0.55} roughness={0.4} />
         </mesh>
-        <mesh position={[-0.02, -0.14, -0.18]} rotation={[Math.PI / 2.4, 0, 0]}>
+        <mesh position={[0.02, -0.14, -0.18]} rotation={[Math.PI / 2.4, 0, 0]}>
           <cylinderGeometry args={[0.075, 0.08, 0.42, 16]} />
           <Mat color={RUBBER} roughness={0.85} metalness={0.05} />
         </mesh>
-        <mesh position={[-0.12, 0.08, 0.02]} rotation={[0, 0, Math.PI / 3]}>
+        <mesh position={[0.12, 0.08, 0.02]} rotation={[0, 0, -Math.PI / 3]}>
           <cylinderGeometry args={[0.02, 0.02, 0.08, 10]} />
           <Mat color={BRASS} metalness={0.7} roughness={0.3} />
         </mesh>
@@ -632,19 +632,20 @@ export function EngineModel() {
         <HexBolt position={[0.04, 0.08, -0.03]} radius={0.012} height={0.016} />
       </PartNode>
 
-      {/* ==================== 11. INJECTION PUMP ==================== */}
+      {/* ==================== 11. INJECTION PUMP (PORT SIDE) ==================== */}
       <PartNode id="injection-pump">
         <mesh castShadow>
           <boxGeometry args={[0.24, 0.28, 0.44]} />
           <Mat color={IRON} metalness={0.45} roughness={0.4} />
         </mesh>
-        {/* Delivery valve holders */}
+        {/* Delivery valve holders on top of pump */}
         {[-0.16, 0, 0.16].map((z) => (
-          <group key={z} position={[-0.02, 0.14, z]}>
+          <group key={z} position={[0.02, 0.14, z]}>
             <cylinderGeometry args={[0.018, 0.02, 0.06, 12]} />
             <Mat color={CHROME} metalness={0.8} roughness={0.2} />
           </group>
         ))}
+        {/* Return Barb Fitting for green hose 036868 */}
         <mesh position={[0.0, 0.12, 0.04]}>
           <cylinderGeometry args={[0.012, 0.012, 0.04, 10]} />
           <Mat color={BRASS} metalness={0.8} roughness={0.25} />
@@ -690,7 +691,7 @@ export function EngineModel() {
         <HexBolt position={[0, 0, 0]} radius={0.02} height={0.036} washer={false} />
       </PartNode>
 
-      {/* ==================== 13. INJECTORS & GLOW PLUGS ==================== */}
+      {/* ==================== 13. INJECTORS & GLOW PLUGS (PORT SIDE) ==================== */}
       {(["injector-1", "injector-2", "injector-3"] as const).map((id) => (
         <PartNode key={id} id={id}>
           <mesh castShadow>
@@ -701,7 +702,8 @@ export function EngineModel() {
             <cylinderGeometry args={[0.026, 0.026, 0.04, 6]} />
             <Mat color={IRON} metalness={0.7} roughness={0.3} />
           </mesh>
-          <mesh position={[0.01, 0.08, 0]} rotation={[0, 0, Math.PI / 2]}>
+          {/* Leak-off nipple pointing outward toward port */}
+          <mesh position={[-0.01, 0.08, 0]} rotation={[0, 0, -Math.PI / 2]}>
             <cylinderGeometry args={[0.01, 0.01, 0.04, 8]} />
             <Mat color={CHROME} metalness={0.85} roughness={0.2} />
           </mesh>
@@ -722,7 +724,7 @@ export function EngineModel() {
 
       <PartNode id="glow-plugs">
         {[-0.26, 0.02, 0.22].map((z) => (
-          <group key={z} position={[0, 0, z]} rotation={[0, 0, Math.PI / 3]}>
+          <group key={z} position={[0, 0, z]} rotation={[0, 0, -Math.PI / 3]}>
             <mesh>
               <cylinderGeometry args={[0.008, 0.008, 0.14, 8]} />
               <Mat color={CHROME} metalness={0.8} roughness={0.2} />
@@ -733,7 +735,7 @@ export function EngineModel() {
             </mesh>
           </group>
         ))}
-        <mesh position={[0.02, 0.06, 0]}>
+        <mesh position={[-0.02, 0.06, 0]}>
           <boxGeometry args={[0.01, 0.005, 0.52]} />
           <Mat color={BRASS} metalness={0.85} roughness={0.2} />
         </mesh>
@@ -956,31 +958,49 @@ export function EngineModel() {
         </mesh>
       </PartNode>
 
-      {/* ==================== 19. COOLING & MARINE EXCHANGER ==================== */}
+      {/* ==================== 19. COOLING & MARINE EXCHANGER (STARBOARD FORE-AFT) ==================== */}
       <PartNode id="heat-exchanger">
-        <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-          <cylinderGeometry args={[0.09, 0.09, 0.72, 24]} />
+        {/* Main Cupronickel Cylindrical Body aligned fore-aft along Z axis */}
+        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.075, 0.075, 0.88, 24]} />
           <Mat color={PAINT} metalness={0.5} roughness={0.35} />
         </mesh>
-        {[-0.37, 0.37].map((x) => (
-          <mesh key={x} position={[x, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.095, 0.095, 0.04, 20]} />
-            <Mat color={BRASS} metalness={0.75} roughness={0.3} />
+        {/* Forward & Aft Cast Bronze End Caps */}
+        {[-0.44, 0.44].map((z) => (
+          <mesh key={z} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.082, 0.082, 0.04, 20]} />
+            <Mat color={BRASS} metalness={0.78} roughness={0.3} />
           </mesh>
         ))}
-        <mesh position={[0, 0.1, 0]}>
-          <cylinderGeometry args={[0.035, 0.035, 0.025, 12]} />
-          <Mat color={CHROME} metalness={0.85} roughness={0.2} />
+        {/* Pressure Filler Cap on top forward */}
+        <mesh position={[0, 0.085, 0.32]}>
+          <cylinderGeometry args={[0.032, 0.032, 0.022, 14]} />
+          <Mat color={CHROME} metalness={0.88} roughness={0.2} />
+        </mesh>
+        {/* Overflow Barb on filler neck */}
+        <mesh position={[-0.03, 0.085, 0.32]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.005, 0.005, 0.025, 8]} />
+          <Mat color={BRASS} metalness={0.85} roughness={0.25} />
+        </mesh>
+        {/* Seawater Inlet Barb (from raw water pump) */}
+        <mesh position={[0, -0.065, 0.36]} rotation={[0, 0, 0]}>
+          <cylinderGeometry args={[0.016, 0.016, 0.04, 10]} />
+          <Mat color={BRASS} metalness={0.85} roughness={0.25} />
+        </mesh>
+        {/* Seawater Outlet Barb (aft to wet exhaust mixing elbow) */}
+        <mesh position={[0, -0.065, -0.38]} rotation={[0, 0, 0]}>
+          <cylinderGeometry args={[0.016, 0.016, 0.04, 10]} />
+          <Mat color={BRASS} metalness={0.85} roughness={0.25} />
         </mesh>
       </PartNode>
 
       <PartNode id="zinc-anode">
-        <mesh rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.016, 0.016, 0.035, 6]} />
+        <mesh rotation={[0, 0, 0]}>
+          <cylinderGeometry args={[0.015, 0.015, 0.03, 6]} />
           <Mat color={BRASS} metalness={0.8} roughness={0.25} />
         </mesh>
-        <mesh position={[0, 0, -0.03]}>
-          <cylinderGeometry args={[0.012, 0.012, 0.06, 12]} />
+        <mesh position={[0, 0.04, 0]}>
+          <cylinderGeometry args={[0.010, 0.010, 0.06, 12]} />
           <Mat color="#9aa0a6" metalness={0.7} roughness={0.4} />
         </mesh>
       </PartNode>
@@ -1223,7 +1243,7 @@ export function EngineModel() {
         })}
       </PartNode>
 
-      {/* External Transmission Oil Cooler on Port Bracket */}
+      {/* External Transmission Oil Cooler on Starboard Bracket */}
       <PartNode id="trans-cooler">
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
           <cylinderGeometry args={[0.035, 0.035, 0.24, 16]} />
@@ -1239,13 +1259,13 @@ export function EngineModel() {
           <Mat color={BRASS} metalness={0.85} roughness={0.2} />
         </mesh>
         {/* Mounting Strap */}
-        <mesh position={[0.02, 0, 0]}>
+        <mesh position={[-0.02, 0, 0]}>
           <boxGeometry args={[0.04, 0.08, 0.04]} />
           <Mat color={IRON} metalness={0.6} roughness={0.4} />
         </mesh>
       </PartNode>
 
-      {/* Shift Linkage Lever (Extends upward/forward outside transmission wall) */}
+      {/* Shift Linkage Lever on Port Side (Extends upward/forward outside transmission wall) */}
       <PartNode id="shift-linkage">
         {/* Pivot Boss Cap */}
         <mesh position={[-0.01, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
@@ -1264,12 +1284,13 @@ export function EngineModel() {
         </mesh>
       </PartNode>
 
+      {/* Throttle speed control lever on Port side */}
       <PartNode id="throttle">
-        <mesh rotation={[0, 0, 0.4]}>
+        <mesh rotation={[0, 0, -0.4]}>
           <cylinderGeometry args={[0.01, 0.01, 0.28, 10]} />
           <Mat color={CHROME} metalness={0.85} roughness={0.25} />
         </mesh>
-        <mesh position={[0.02, 0.12, 0]}>
+        <mesh position={[-0.02, 0.12, 0]}>
           <sphereGeometry args={[0.018, 12, 12]} />
           <Mat color={IRON} />
         </mesh>
