@@ -112,7 +112,7 @@ function ClampBand({
 // Reusable Banjo Crush Washer Ring
 function BanjoCrushRing({
   position = [0, 0, 0],
-  rotation = [0, 0, 0],
+  rotation = [Math.PI / 2, 0, 0],
   outerRadius = 0.022,
   innerRadius = 0.014,
 }: {
@@ -747,13 +747,13 @@ export function EngineModel() {
       ))}
 
       <PartNode id="injector-nuts">
-        {[-0.28, 0, 0.28].map((z) => (
+        {[-0.28, 0, 0.20].map((z) => (
           <HexBolt key={z} position={[0, 0, z]} radius={0.016} height={0.02} washer={true} />
         ))}
       </PartNode>
 
       <PartNode id="injector-gaskets">
-        {[-0.28, 0, 0.28].map((z) => (
+        {[-0.28, 0, 0.20].map((z) => (
           <BanjoCrushRing key={z} position={[0, 0, z]} outerRadius={0.02} innerRadius={0.012} />
         ))}
       </PartNode>
