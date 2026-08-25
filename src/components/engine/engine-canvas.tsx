@@ -7,7 +7,7 @@ import { EngineModel } from "./engine-model";
 import { useEngineStore, type CameraView } from "@/lib/engine/store";
 
 const PRESETS: Record<CameraView, [number, number, number]> = {
-  iso: [-2.4, 1.6, 2.2],
+  iso: [-2.2, 1.4, 2.0],
   front: [0.0, 0.45, 3.2],
   side: [-3.2, 0.55, 0.15],
   top: [0.0, 3.55, 0.1],

@@ -189,50 +189,50 @@ export function EngineModel() {
   const propBladeGeom = useMemo(() => createPropellerBladeGeometry(0.36, 0.042), []);
 
   // ===================== PORT SIDE FUEL LINES (X < 0) =====================
-  // 1. High Pressure Injector Lines (from pump delivery valves at [-0.42, 0.16, z] up to injector bodies at [-0.25, 0.48, z])
+  // 1. High Pressure Injector Lines (from pump delivery valves at [-0.30, 0.22, z] up to injector bodies at [-0.20, 0.44, z])
   const hp1 = useMemo(
     () =>
       tube([
-        [-0.42, 0.16, -0.12],
-        [-0.38, 0.32, -0.16],
-        [-0.30, 0.44, -0.22],
-        [-0.25, 0.48, -0.24],
-      ], 0.007),
+        [-0.30, 0.22, -0.12],
+        [-0.28, 0.32, -0.18],
+        [-0.23, 0.40, -0.22],
+        [-0.20, 0.44, -0.24],
+      ], 0.006),
     [],
   );
 
   const hp2 = useMemo(
     () =>
       tube([
-        [-0.42, 0.16, 0.04],
-        [-0.36, 0.32, 0.04],
-        [-0.29, 0.44, 0.04],
-        [-0.25, 0.48, 0.04],
-      ], 0.007),
+        [-0.30, 0.22, 0.04],
+        [-0.26, 0.32, 0.04],
+        [-0.22, 0.40, 0.04],
+        [-0.20, 0.44, 0.04],
+      ], 0.006),
     [],
   );
 
   const hp3 = useMemo(
     () =>
       tube([
-        [-0.42, 0.16, 0.20],
-        [-0.38, 0.32, 0.22],
-        [-0.30, 0.44, 0.23],
-        [-0.25, 0.48, 0.24],
-      ], 0.007),
+        [-0.30, 0.22, 0.20],
+        [-0.28, 0.32, 0.22],
+        [-0.23, 0.40, 0.23],
+        [-0.20, 0.44, 0.24],
+      ], 0.006),
     [],
   );
 
-  // 2. Focus Green Injector Return Hose 036868 (from injector leak-off at [-0.26, 0.56, -0.24] arching down to pump return barb [-0.44, 0.16, 0.08])
+  // 2. Focus Green Injector Return Hose 036868 (from injector leak-off rail at [-0.21, 0.52, -0.24] arching down to pump return barb [-0.30, 0.20, 0.08])
   const returnHoseTube = useMemo(
     () =>
       tube([
-        [-0.26, 0.56, -0.24],
-        [-0.30, 0.52, -0.12],
-        [-0.36, 0.44, 0.0],
-        [-0.42, 0.30, 0.06],
-        [-0.44, 0.16, 0.08],
-      ], 0.010),
+        [-0.21, 0.52, -0.24],
+        [-0.24, 0.48, -0.12],
+        [-0.27, 0.38, 0.0],
+        [-0.30, 0.26, 0.06],
+        [-0.30, 0.20, 0.08],
+      ], 0.008),
     [],
   );
 
@@ -240,20 +240,20 @@ export function EngineModel() {
   const fuelReturn2 = useMemo(
     () =>
       tube([
-        [-0.44, 0.14, 0.08],
-        [-0.48, 0.10, -0.06],
-        [-0.46, 0.04, -0.22],
-      ], 0.009),
+        [-0.30, 0.18, 0.08],
+        [-0.36, 0.14, -0.06],
+        [-0.42, 0.10, -0.22],
+      ], 0.008),
     [],
   );
 
   const fuelReturn3 = useMemo(
     () =>
       tube([
-        [-0.44, 0.14, 0.08],
-        [-0.50, 0.08, 0.16],
-        [-0.54, 0.02, 0.24],
-      ], 0.009),
+        [-0.30, 0.18, 0.08],
+        [-0.38, 0.12, 0.16],
+        [-0.44, 0.06, 0.24],
+      ], 0.008),
     [],
   );
 
@@ -261,31 +261,31 @@ export function EngineModel() {
   const hoseFuelSupply = useMemo(
     () =>
       tube([
-        [-0.56, 0.30, 0.36],
-        [-0.54, 0.12, 0.36],
-        [-0.50, -0.08, 0.36],
-      ], 0.010),
+        [-0.48, 0.30, 0.36],
+        [-0.46, 0.12, 0.36],
+        [-0.44, -0.06, 0.36],
+      ], 0.009),
     [],
   );
 
   const hoseLiftToFilter = useMemo(
     () =>
       tube([
-        [-0.50, -0.05, 0.36],
-        [-0.52, 0.06, 0.18],
-        [-0.50, 0.14, -0.05],
-        [-0.46, 0.18, -0.18],
-      ], 0.009),
+        [-0.44, -0.04, 0.36],
+        [-0.46, 0.06, 0.18],
+        [-0.45, 0.14, -0.05],
+        [-0.44, 0.18, -0.22],
+      ], 0.008),
     [],
   );
 
   const hoseFilterToInj = useMemo(
     () =>
       tube([
-        [-0.46, 0.14, -0.20],
-        [-0.45, 0.08, -0.12],
-        [-0.44, 0.06, -0.02],
-      ], 0.009),
+        [-0.44, 0.16, -0.22],
+        [-0.38, 0.12, -0.12],
+        [-0.30, 0.10, -0.02],
+      ], 0.008),
     [],
   );
 
@@ -433,33 +433,39 @@ export function EngineModel() {
       <SimTicker />
       <FuelParticles />
 
-      {/* ==================== 1. CYLINDER BLOCK & FRONT GEAR CASE ==================== */}
+      {/* ==================== 1. ENGINE BLOCK & LOWER CRANKCASE ==================== */}
       <PartNode id="block">
-        <mesh castShadow receiveShadow>
-          <boxGeometry args={[0.72, 0.52, 1.12]} />
+        {/* Main Crankcase Lower Half */}
+        <mesh position={[0, -0.06, 0]} castShadow>
+          <boxGeometry args={[0.54, 0.28, 1.00]} />
           <Mat color={PAINT} roughness={0.55} metalness={0.18} />
         </mesh>
-        {/* Front Timing Gear Case Cover (Forward of block from Z = 0.56 to 0.64) */}
-        <mesh position={[0, 0.02, 0.60]} castShadow>
-          <boxGeometry args={[0.68, 0.50, 0.08]} />
+        {/* Cylinder Bank Upper Half (Stepped narrower for realism) */}
+        <mesh position={[0.02, 0.14, 0]} castShadow>
+          <boxGeometry args={[0.46, 0.16, 0.96]} />
+          <Mat color={PAINT} roughness={0.55} metalness={0.18} />
+        </mesh>
+        {/* Port Side Injection Pump Mounting Shelf (Recessed flange at X = -0.22) */}
+        <mesh position={[-0.24, 0.04, 0.04]} castShadow>
+          <boxGeometry args={[0.08, 0.18, 0.48]} />
+          <Mat color={PAINT_DARK} roughness={0.6} metalness={0.2} />
+        </mesh>
+        {/* Front Timing Gear Case Cover (Forward of block from Z = 0.50 to 0.58) */}
+        <mesh position={[0, 0.02, 0.54]} castShadow>
+          <boxGeometry args={[0.56, 0.44, 0.08]} />
           <Mat color={PAINT_DARK} roughness={0.5} metalness={0.2} />
         </mesh>
         {/* Cylinder Bores */}
         {[-0.24, 0.04, 0.24].map((z) => (
-          <mesh key={z} position={[0, 0.261, z]}>
-            <cylinderGeometry args={[0.12, 0.12, 0.02, 20]} />
+          <mesh key={z} position={[0, 0.221, z]}>
+            <cylinderGeometry args={[0.10, 0.10, 0.02, 20]} />
             <Mat color="#241014" roughness={0.8} metalness={0.2} />
           </mesh>
         ))}
-        {/* Side inspection cover */}
-        <mesh position={[0.37, 0.02, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <boxGeometry args={[0.28, 0.06, 0.9]} />
-          <Mat color={PAINT_DARK} />
-        </mesh>
         {/* Engine Mount Foot Brackets */}
-        {[[-0.38, -0.22, 0.35], [-0.38, -0.22, -0.35], [0.38, -0.22, 0.35], [0.38, -0.22, -0.35]].map((pos, i) => (
+        {[[-0.32, -0.16, 0.35], [-0.32, -0.16, -0.35], [0.32, -0.16, 0.35], [0.32, -0.16, -0.35]].map((pos, i) => (
           <mesh key={i} position={pos as [number, number, number]} castShadow>
-            <boxGeometry args={[0.14, 0.08, 0.16]} />
+            <boxGeometry args={[0.12, 0.08, 0.14]} />
             <Mat color={IRON} metalness={0.6} roughness={0.4} />
           </mesh>
         ))}
@@ -467,22 +473,23 @@ export function EngineModel() {
 
       {/* ==================== 2. CYLINDER HEAD ==================== */}
       <PartNode id="head">
-        <mesh castShadow>
-          <boxGeometry args={[0.72, 0.22, 1.12]} />
+        {/* Main Cylinder Head Casting */}
+        <mesh position={[0.02, 0, 0]} castShadow>
+          <boxGeometry args={[0.48, 0.18, 0.98]} />
           <Mat color={PAINT} roughness={0.5} metalness={0.2} />
         </mesh>
-        {/* Combustion chamber pre-chambers */}
+        {/* Port-side Injector Port Bosses */}
         {[-0.24, 0.04, 0.24].map((z) => (
-          <mesh key={z} position={[0.25, 0.08, z]}>
-            <cylinderGeometry args={[0.045, 0.048, 0.1, 14]} />
-            <Mat color={IRON} />
+          <mesh key={z} position={[-0.20, 0.04, z]} rotation={[0, 0, -Math.PI / 12]}>
+            <cylinderGeometry args={[0.042, 0.045, 0.10, 14]} />
+            <Mat color={PAINT_DARK} />
           </mesh>
         ))}
         {/* Head Bolt Bosses */}
-        {[-0.42, -0.14, 0.14, 0.42].map((z) =>
-          [-0.26, 0.26].map((x) => (
-            <mesh key={`${x}-${z}`} position={[x, 0.11, z]}>
-              <cylinderGeometry args={[0.022, 0.022, 0.03, 10]} />
+        {[-0.38, -0.12, 0.12, 0.38].map((z) =>
+          [-0.20, 0.22].map((x) => (
+            <mesh key={`${x}-${z}`} position={[x, 0.09, z]}>
+              <cylinderGeometry args={[0.018, 0.018, 0.025, 10]} />
               <Mat color={CHROME} metalness={0.8} roughness={0.25} />
             </mesh>
           )),
@@ -632,23 +639,52 @@ export function EngineModel() {
         <HexBolt position={[0.04, 0.08, -0.03]} radius={0.012} height={0.016} />
       </PartNode>
 
-      {/* ==================== 11. INJECTION PUMP (PORT SIDE) ==================== */}
+      {/* ==================== 11. INJECTION PUMP (PORT SIDE - DETAILED BOSCH DIESEL PUMP) ==================== */}
       <PartNode id="injection-pump">
-        <mesh castShadow>
-          <boxGeometry args={[0.24, 0.28, 0.44]} />
-          <Mat color={IRON} metalness={0.45} roughness={0.4} />
+        {/* Main Lower Cast Cam Box / Roller Tappet Body */}
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[0.16, 0.18, 0.44]} />
+          <Mat color={IRON} metalness={0.5} roughness={0.4} />
         </mesh>
-        {/* Delivery valve holders on top of pump */}
+        {/* Upper Precision Plunger Pump Barrel Block */}
+        <mesh position={[0, 0.08, 0]} castShadow>
+          <boxGeometry args={[0.14, 0.10, 0.42]} />
+          <Mat color={IRON} metalness={0.65} roughness={0.35} />
+        </mesh>
+        {/* Aft Mechanical Governor Spring Casing */}
+        <mesh position={[-0.01, 0.02, -0.25]} castShadow>
+          <cylinderGeometry args={[0.065, 0.07, 0.12, 16]} />
+          <Mat color={ALUM} metalness={0.6} roughness={0.3} />
+        </mesh>
+        {/* Forward Timing Control Flange Plate */}
+        <mesh position={[0, -0.02, 0.23]} castShadow>
+          <boxGeometry args={[0.18, 0.16, 0.025]} />
+          <Mat color={IRON} metalness={0.7} roughness={0.3} />
+        </mesh>
+        {/* Individual Delivery Valve Hex Holders (3-cyl staged) */}
         {[-0.16, 0, 0.16].map((z) => (
-          <group key={z} position={[0.02, 0.14, z]}>
-            <cylinderGeometry args={[0.018, 0.02, 0.06, 12]} />
-            <Mat color={CHROME} metalness={0.8} roughness={0.2} />
+          <group key={z} position={[0.0, 0.14, z]}>
+            {/* Hex Base Nut */}
+            <mesh>
+              <cylinderGeometry args={[0.018, 0.018, 0.025, 6]} />
+              <Mat color={CHROME} metalness={0.85} roughness={0.2} />
+            </mesh>
+            {/* Threaded Collar fitting */}
+            <mesh position={[0, 0.022, 0]}>
+              <cylinderGeometry args={[0.013, 0.013, 0.022, 12]} />
+              <Mat color={CHROME} metalness={0.85} roughness={0.2} />
+            </mesh>
           </group>
         ))}
-        {/* Return Barb Fitting for green hose 036868 */}
-        <mesh position={[0.0, 0.12, 0.04]}>
-          <cylinderGeometry args={[0.012, 0.012, 0.04, 10]} />
+        {/* Bleed Vent Screw on pump side */}
+        <mesh position={[-0.08, 0.08, -0.08]} rotation={[0, 0, -Math.PI / 2]}>
+          <cylinderGeometry args={[0.008, 0.008, 0.02, 6]} />
           <Mat color={BRASS} metalness={0.8} roughness={0.25} />
+        </mesh>
+        {/* Return Barb Fitting for 036868 green hose */}
+        <mesh position={[0.0, 0.15, 0.04]}>
+          <cylinderGeometry args={[0.009, 0.009, 0.035, 10]} />
+          <Mat color={BRASS} metalness={0.85} roughness={0.25} />
         </mesh>
       </PartNode>
 
