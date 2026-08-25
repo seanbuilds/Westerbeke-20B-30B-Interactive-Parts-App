@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Westerbeke 20B/30B Interactive Engine Parts App — Hoses, Nuts &amp; Washers</title>
+<style>
+  :root {
+    --primary: #c41e3a;
+    --dark: #1a1a1a;
+    --light: #f5f5f5;
+    --accent: #ff6b35;
+    --card-bg: #ffffff;
+    --border: #e0e0e0;
+    --ok: #00a85a;
+    --ok-bg: #e8fff3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #333;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 { font-size: 1.35rem; margin-bottom: 0.25rem; }
+  header p { font-size: 0.88rem; opacity: 0.92; }
+  .disclaimer {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #ffc107;
+  }
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 1.25rem;
+  }
+  @media (max-width: 980px) {
+    .container { grid-template-columns: 1fr; }
+  }
+  .main-panel { display: flex; flex-direction: column; gap: 1rem; }
+  .card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
+  .card-header {
+    background: var(--dark);
+    color: white;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .image-wrapper {
+    position: relative;
+    background: #111;
+    overflow: hidden;
+  }
+  .image-wrapper img {
+    width: 100%;
+    display: block;
+    max-height: 520px;
+    object-fit: contain;
+  }
+  .hotspot {
+    position: absolute;
+    border: 2px solid var(--accent);
+    background: rgba(255, 107, 53, 0.25);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+  .hotspot:hover, .hotspot.active {
+    background: rgba(255, 107, 53, 0.5);
+    box-shadow: 0 0 12px var(--accent);
+    transform: scale(1.02);
+  }
+  .hotspot.highlight {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.35);
+    animation: pulse 1.5s infinite;
+  }
+  .hotspot.hardware {
+    border-color: #4ea1ff;
+    background: rgba(78, 161, 255, 0.28);
+  }
+  .hotspot.hardware:hover, .hotspot.hardware.active {
+    background: rgba(78, 161, 255, 0.5);
+    box-shadow: 0 0 12px #4ea1ff;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 8px #00ff88; }
+    50% { box-shadow: 0 0 18px #00ff88; }
+  }
+  .hotspot-label {
+    position: absolute;
+    top: -22px;
+    left: 0;
+    background: var(--accent);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .hotspot.highlight .hotspot-label { background: #00a85a; }
+  .hotspot.hardware .hotspot-label { background: #2b6cb0; }
+  .tabs {
+    display: flex;
+    background: #222;
+    flex-wrap: wrap;
+  }
+  .tab {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.6rem;
+    text-align: center;
+    color: #aaa;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  .tab.active { color: white; background: var(--primary); }
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .search-box {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0 0.75rem 0.5rem;
+  }
+  .chip {
+    border: 1px solid var(--border);
+    background: #f7f7f7;
+    color: #444;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .chip.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .chip.hose.active { background: #2b6cb0; border-color: #2b6cb0; }
+  .chip.fastener.active { background: #5b4b8a; border-color: #5b4b8a; }
+  .chip.clamp.active { background: #0f766e; border-color: #0f766e; }
+  .parts-list {
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .part-item {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .part-item:hover, .part-item.active {
+    background: #fff5f0;
+  }
+  .part-item.highlight-item {
+    background: var(--ok-bg);
+    border-left: 4px solid var(--ok);
+  }
+  .part-item.hose-item { border-left: 3px solid #4ea1ff; }
+  .part-item.fastener-item { border-left: 3px solid #8b7cc9; }
+  .part-item.clamp-item { border-left: 3px solid #14b8a6; }
+  .part-num {
+    font-weight: 700;
+    color: var(--primary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9rem;
+  }
+  .part-name { font-size: 0.9rem; }
+  .part-notes { font-size: 0.8rem; color: #666; margin-top: 2px; }
+  .part-cat {
+    display: inline-block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #eee;
+    color: #555;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .highlight-box {
+    background: linear-gradient(135deg, #e8fff3, #c8f7dc);
+    border: 2px solid #00c853;
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  .highlight-box h3 {
+    color: #00695c;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal.open { display: flex; }
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .modal-header {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-body { padding: 1.25rem; }
+  .modal-body p { margin-bottom: 0.55rem; }
+  .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  .btn:hover { background: #a01830; }
+  .btn-secondary { background: #555; }
+  .btn-secondary:hover { background: #333; }
+  .manuals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  .manuals a { font-size: 0.8rem; padding: 0.4rem 0.7rem; }
+  footer {
+    text-align: center;
+    color: #888;
+    padding: 1.5rem;
+    font-size: 0.8rem;
+  }
+  .badge {
+    display: inline-block;
+    background: #00c853;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+  }
+  .flow {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+  }
+  .flow-arrow { color: var(--primary); font-weight: bold; min-width: 1.2rem; }
+  .hardware-map {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  .hardware-map h4 {
+    margin: 0.75rem 0 0.35rem;
+    font-size: 0.95rem;
+    color: #222;
+  }
+  .hardware-map ul {
+    margin-left: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+  .hardware-map li { margin-bottom: 0.25rem; }
+  .tag {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #f0f0f0;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+  }
+  .count-pill {
+    font-size: 0.75rem;
+    font-weight: 400;
+    opacity: 0.85;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Westerbeke 20B TWO / 30B THREE — Interactive Parts App</h1>
+  <p>Hoses · Clamps · Nuts · Washers · Fuel &amp; Cooling Hardware | Pub #037115 + installation photos</p>
+</header>
+
+<div class="disclaimer">
+  <strong>Disclaimer:</strong> Identification is based on visual match + Westerbeke part #036868 / Keystone #037163. Confirm the serial plate (usually on exhaust manifold or block) before ordering. Photos show corrosion — inspect every hose, clamp, and fitting before service. Racor R15T is aftermarket. Hardware quantities marked AR = as required.
+</div>
+
+<div class="container">
+  <div class="main-panel">
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="front">Front / Fuel + Hoses</button>
+        <button class="tab" data-tab="side">Side / Exhaust + Clamps</button>
+      </div>
+      <div id="view-front" class="image-wrapper">
+        <img src="engine_front.jpg" alt="Westerbeke engine front view with fuel system and hoses">
+        <div class="hotspot highlight" style="left:38%; top:48%; width:18%; height:14%;" data-part="036868" title="Injector Return Hose 036868">
+          <span class="hotspot-label">036868 Return Hose ★</span>
+        </div>
+        <div class="hotspot hardware" style="left:36%; top:44%; width:8%; height:6%;" data-part="037163" title="Keystone Clamp 037163">
+          <span class="hotspot-label">037163 Clamp</span>
+        </div>
+        <div class="hotspot" style="left:8%; top:16%; width:18%; height:26%;" data-part="R15T" title="Racor Fuel Filter">
+          <span class="hotspot-label">Racor R15T</span>
+        </div>
+        <div class="hotspot" style="left:54%; top:38%; width:13%; height:14%;" data-part="INJP" title="Injection Pump">
+          <span class="hotspot-label">Inj. Pump</span>
+        </div>
+        <div class="hotspot" style="left:60%; top:28%; width:18%; height:16%;" data-part="HPLINES" title="High Pressure Lines">
+          <span class="hotspot-label">HP Lines</span>
+        </div>
+        <div class="hotspot hardware" style="left:20%; top:36%; width:12%; height:14%;" data-part="COOLANT-HOSES" title="Coolant bottle hoses">
+          <span class="hotspot-label">Coolant Hoses</span>
+        </div>
+        <div class="hotspot" style="left:46%; top:58%; width:12%; height:10%;" data-part="THROTTLE" title="Throttle Linkage">
+          <span class="hotspot-label">Throttle</span>
+        </div>
+        <div class="hotspot hardware" style="left:32%; top:62%; width:14%; height:10%;" data-part="011405" title="Hose Clamps on cooling lines">
+          <span class="hotspot-label">Clamp 011405</span>
+        </div>
+      </div>
+      <div id="view-side" class="image-wrapper" style="display:none;">
+        <img src="engine_side.jpg" alt="Westerbeke engine side / exhaust view">
+        <div class="hotspot" style="left:55%; top:52%; width:28%; height:22%;" data-part="EXHAUST" title="Wet Exhaust Hose">
+          <span class="hotspot-label">Wet Exhaust Hose</span>
+        </div>
+        <div class="hotspot hardware" style="left:52%; top:48%; width:10%; height:8%;" data-part="011405-EX" title="Exhaust Hose Clamps">
+          <span class="hotspot-label">Exhaust Clamps</span>
+        </div>
+        <div class="hotspot" style="left:28%; top:34%; width:20%; height:16%;" data-part="MANIFOLD" title="Exhaust Manifold">
+          <span class="hotspot-label">Manifold</span>
+        </div>
+        <div class="hotspot hardware" style="left:30%; top:30%; width:12%; height:8%;" data-part="MANIFOLD-HW" title="Manifold Studs Nuts Washers">
+          <span class="hotspot-label">M8 Studs/Nuts</span>
+        </div>
+        <div class="hotspot" style="left:22%; top:18%; width:22%; height:14%;" data-part="037506" title="Fresh water pump to heat exchanger hose">
+          <span class="hotspot-label">FW→HEX Hose</span>
+        </div>
+        <div class="hotspot" style="left:8%; top:48%; width:16%; height:18%;" data-part="TRANSMISSION" title="Marine gear / cooler hoses">
+          <span class="hotspot-label">Gear Cooler Hoses</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Where the hoses, nuts &amp; washers live</div>
+      <div class="hardware-map">
+        <p>Every flexible line on this engine is held by clamps. Every major casting is held by metric studs, nuts, flat washers, and lockwashers. Below is the hardware map from Pub <span class="tag">#037115</span>.</p>
+
+        <h4>Fuel system hoses &amp; clamps (Pub #037115)</h4>
+        <ul>
+          <li><span class="tag">036868</span> Injector return (leak-off) hose to pump — <strong>focus part</strong> (listed NLA online — confirm supersession)</li>
+          <li><span class="tag">037163</span> Keystone clamps ×2 on 036868</li>
+          <li><span class="tag">034857</span> / <span class="tag">037187</span> Additional fuel return hoses</li>
+          <li><span class="tag">038047</span> Lift pump → fuel filter hose</li>
+          <li><span class="tag">036865</span> Filter → injection pump hose</li>
+          <li><span class="tag">030025</span> Fuel hose (supply side)</li>
+          <li><span class="tag">036951 / 036952</span> High-pressure injector lines (20B)</li>
+          <li><span class="tag">024906</span> Mini / general hose clamps (fuel)</li>
+        </ul>
+        <h4>Fuel banjo washers &amp; bolts</h4>
+        <ul>
+          <li><span class="tag">037105</span> Banjo washer ×2 (return stack)</li>
+          <li><span class="tag">030289</span> Banjo washer M8 · <span class="tag">030291</span> Banjo washer M14</li>
+          <li><span class="tag">037104</span> Banjo washer (bleed stack)</li>
+          <li><span class="tag">037110</span> Bleed bolt · <span class="tag">037111</span> Banjo bolt · <span class="tag">016988</span> Banjo bolt M8</li>
+          <li><span class="tag">036921</span> Injector nuts · <span class="tag">036922</span> Injector leak-off gaskets</li>
+        </ul>
+
+        <h4>Cooling system hoses (20B example)</h4>
+        <ul>
+          <li><span class="tag">037157</span> Sea pump → heat exchanger</li>
+          <li><span class="tag">037383</span> Thermostat → manifold</li>
+          <li><span class="tag">037506</span> Fresh-water pump → heat exchanger</li>
+          <li><span class="tag">036654</span> Flow-controller return bend (¾″)</li>
+          <li><span class="tag">036556</span> Flow-control hose ×2</li>
+          <li><span class="tag">045041 / 045042</span> Hose kits (20B / 30B)</li>
+        </ul>
+
+        <h4>Clamps used on cooling / exhaust</h4>
+        <ul>
+          <li><span class="tag">011386</span> Hose clamp size 12 (common on smaller lines)</li>
+          <li><span class="tag">011405</span> Hose clamp size 16 (thermostat, manifold, exchanger)</li>
+          <li><span class="tag">021878</span> Hose clamp size 20 (larger cooling lines)</li>
+        </ul>
+
+        <h4>Nuts, washers, studs (metric)</h4>
+        <ul>
+          <li><span class="tag">015830</span> Stud M8×25 — exhaust manifold to head (×4 typical)</li>
+          <li><span class="tag">018242</span> Nut M8 DIN 934 — manifold nuts</li>
+          <li><span class="tag">031787</span> Washer M8 DIN 125 (flat)</li>
+          <li><span class="tag">031786</span> Lockwasher M8 DIN 127</li>
+          <li><span class="tag">031784</span> Washer M6 DIN 125 · <span class="tag">031783</span> Lockwasher M6</li>
+          <li><span class="tag">018804</span> Capscrew M6×20 — pumps, covers, small brackets</li>
+          <li><span class="tag">031789</span> Washer M10 · <span class="tag">019262</span> Lockwasher M10 · <span class="tag">015887</span> Nut M10</li>
+          <li><span class="tag">037162</span> Banjo washer M16 (thermostat / cooling fittings)</li>
+          <li><span class="tag">036493</span> Banjo washer — sump drain (×2)</li>
+        </ul>
+
+        <h4>Oil / sump hose hardware</h4>
+        <ul>
+          <li><span class="tag">033691</span> Sump drain hose (or <span class="tag">033056</span> alternate length)</li>
+          <li><span class="tag">036819</span> Banjo bolt — sump drain</li>
+          <li><span class="tag">024922</span> Bracket for sump drain hose</li>
+          <li><span class="tag">024905</span> Cap for sump drain hose</li>
+        </ul>
+
+        <h4>Transmission cooler hoses</h4>
+        <ul>
+          <li><span class="tag">037154</span> Hose, transmission sea water ×2</li>
+          <li><span class="tag">011405</span> Clamps ×4 on those lines</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Fuel system flow (with return hardware)</div>
+      <div class="flow">
+        <div class="flow-step"><span class="flow-arrow">①</span> Tank → Primary filter / water separator (Racor R15T aftermarket on this boat)</div>
+        <div class="flow-step"><span class="flow-arrow">②</span> Lift pump → Secondary filter assembly <span class="tag">030210</span> (element <span class="tag">030200</span>)</div>
+        <div class="flow-step"><span class="flow-arrow">③</span> Injection pump <span class="tag">037102</span> (20B) / <span class="tag">037103</span> (30B)</div>
+        <div class="flow-step"><span class="flow-arrow">④</span> HP lines <span class="tag">036951/52/53</span> → injectors <span class="tag">037091</span></div>
+        <div class="flow-step"><span class="flow-arrow">⑤</span> Injector leak-off → <strong>hose <span class="tag">036868</span></strong> → pump / tank</div>
+        <div class="flow-step"><span class="flow-arrow">⑥</span> Clamped with Keystone <span class="tag">037163</span> ×2 — inspect for cuts from overtightening</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Official manuals</div>
+      <div class="manuals">
+        <a class="btn" href="https://www.westerbeke.com/parts%20manual/37115_rev2_12c_20b_30b_parts_list.pdf" target="_blank" rel="noreferrer">Parts List #037115</a>
+        <a class="btn btn-secondary" href="https://www.westerbeke.com/technical%20manual/37600_12c_20b_30b_technical_manual.pdf" target="_blank" rel="noreferrer">Tech Manual #037600</a>
+        <a class="btn btn-secondary" href="https://www.westerbeke.com/" target="_blank" rel="noreferrer">Westerbeke Official</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="highlight-box">
+      <h3>★ Focus hardware on this engine</h3>
+      <div class="part-num">036868</div>
+      <div class="part-name">HOSE, INJECTOR RETURN TO PUMP</div>
+      <div class="part-notes">Qty 1 — leak-off / return. Replace if cracked, swollen, or diesel-soaked. <strong>Westerbeke lists 036868 as NLA</strong> — confirm supersession before ordering.</div>
+      <br>
+      <div class="part-num">037163</div>
+      <div class="part-name">CLAMP, KEYSTONE</div>
+      <div class="part-notes">Qty 2 — hold 036868. Correct size; do not cut the hose by overtightening.</div>
+      <button class="btn" style="margin-top:0.75rem;width:100%;" onclick="showPart('036868')">View hose details</button>
+      <button class="btn btn-secondary" style="margin-top:0.4rem;width:100%;" onclick="showPart('037163')">View clamp details</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        Parts catalog
+        <span class="count-pill" id="partsCount"></span>
+      </div>
+      <div style="padding:0.75rem 0.75rem 0.25rem;">
+        <input type="text" class="search-box" id="search" placeholder="Search PN, hose, nut, washer…" oninput="filterParts()">
+      </div>
+      <div class="filter-chips" id="chips">
+        <button type="button" class="chip active" data-cat="all">All</button>
+        <button type="button" class="chip hose" data-cat="hose">Hoses</button>
+        <button type="button" class="chip clamp" data-cat="clamp">Clamps</button>
+        <button type="button" class="chip fastener" data-cat="fastener">Nuts / Washers</button>
+        <button type="button" class="chip" data-cat="fuel">Fuel</button>
+        <button type="button" class="chip" data-cat="cooling">Cooling</button>
+        <button type="button" class="chip" data-cat="service">Service</button>
+      </div>
+      <div class="parts-list" id="partsList"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Educational identification aid for Westerbeke 20B TWO / 30B THREE.<br>
+  Parts numbers from Pub #037115. Images © installation owner. Not affiliated with Westerbeke Corporation.<br>
+  Always confirm serial number and torque specs from the technical manual before service.
+</footer>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span id="modalTitle">Part Details</span>
+      <button class="close-btn" onclick="closeModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// Expanded catalog from Westerbeke Pub #037115 — fuel, cooling, clamps, nuts, washers, studs
+const parts = [
+  // —— FOCUS / USER (Pub #037115 fuel system refs 51–53) ——
+  {
+    id: "036868",
+    num: "036868",
+    name: "HOSE, INJECTOR RETURN TO PUMP",
+    qty: "1",
+    cat: "hose",
+    system: "fuel",
+    notes: "Official Pub #037115 fuel-system item. Flexible leak-off / return hose from the injectors back toward the injection pump. Critical for pressure balance. Westerbeke online lists this PN as no longer available (NLA) — dealers may supersede; measure OD/ID and length before ordering aftermarket. Replace if cracked, swollen, soft, or diesel-soaked.",
+    models: "20B TWO / 30B THREE",
+    highlight: true,
+    service: "Pair with two 037163 Keystone clamps. Inspect at every oil change. NLA status means confirm supersession with Westerbeke / dealer before ordering."
+  },
+  {
+    id: "037163",
+    num: "037163",
+    name: "CLAMP, KEYSTONE",
+    qty: "2",
+    cat: "clamp",
+    system: "fuel",
+    notes: "Pub #037115: two Keystone clamps secure hose 036868. Correct size only. Overtightening cuts the hose and creates a leak path.",
+    models: "20B TWO / 30B THREE",
+    highlight: true,
+    service: "Replace with the hose. Do not reuse crushed clamps."
+  },
+
+  // —— FUEL HOSES / LINES (official fuel group) ——
+  {
+    id: "034857",
+    num: "034857",
+    name: "HOSE, FUEL RETURN",
+    qty: "1",
+    cat: "hose",
+    system: "fuel",
+    notes: "Pub #037115 fuel system: separate fuel-return hose (distinct from injector leak-off 036868).",
+    models: "20B / 30B"
+  },
+  {
+    id: "037187",
+    num: "037187",
+    name: "HOSE, FUEL RETURN",
+    qty: "1",
+    cat: "hose",
+    system: "fuel",
+    notes: "Additional fuel-return hose called out in the 20B fuel-system group (ref near banjo hardware).",
+    models: "20B / 30B"
+  },
+  {
+    id: "038047",
+    num: "038047",
+    name: "HOSE, LIFT PUMP TO FUEL FILTER",
+    qty: "1",
+    cat: "hose",
+    system: "fuel",
+    notes: "Supply hose from electric lift pump to the secondary fuel filter assembly.",
+    models: "20B / 30B"
+  },
+  {
+    id: "036865",
+    num: "036865",
+    name: "HOSE, FILTER TO INJECTION PUMP",
+    qty: "1",
+    cat: "hose",
+    system: "fuel",
+    notes: "Hose from secondary fuel filter to the injection pump inlet.",
+    models: "20B / 30B"
+  },
+  {
+    id: "030025",
+    num: "030025",
+    name: "HOSE, FUEL",
+    qty: "1",
+    cat: "hose",
+    system: "fuel",
+    notes: "General fuel hose in the 20B fuel group (often tank/primary side of the circuit).",
+    models: "20B / 30B"
+  },
+  {
+    id: "HPLINES",
+    num: "036951 / 036952",
+    name: "LINE, INJECTOR (HIGH PRESSURE)",
+    qty: "2 (20B) / 3 (30B)",
+    cat: "hose",
+    system: "fuel",
+    notes: "Rigid high-pressure steel lines from injection pump to injectors. 036951 = line 1, 036952 = line 2 (20B). 30B adds a third line. Do not bend. Torque carefully.",
+    models: "20B / 30B"
+  },
+  {
+    id: "037098",
+    num: "037098",
+    name: "LINE, INJECTOR LEAK-OFF",
+    qty: "1",
+    cat: "hose",
+    system: "fuel",
+    notes: "Metal leak-off / return line section at the injectors before the flexible hose 036868.",
+    models: "20B / 30B"
+  },
+  {
+    id: "INJP",
+    num: "037102",
+    name: "PUMP, FUEL INJECTION",
+    qty: "1",
+    cat: "fuel",
+    system: "fuel",
+    notes: "037102 = 20B TWO. 30B uses 037103. Bosch-type pump. Timing is critical — do not disturb without the proper pin and tech manual #037600.",
+    models: "20B TWO (037102) / 30B THREE (037103)"
+  },
+  {
+    id: "037091",
+    num: "037091",
+    name: "INJECTOR (COMPLETE)",
+    qty: "2 or 3",
+    cat: "fuel",
+    system: "fuel",
+    notes: "Complete injector assembly (holder + nozzle + spring). 2 on 20B, 3 on 30B. Leak-off ports feed the return path to hose 036868.",
+    models: "20B / 30B"
+  },
+  {
+    id: "036921",
+    num: "036921",
+    name: "NUT, INJECTOR",
+    qty: "2 (20B) / 3 (30B)",
+    cat: "fastener",
+    system: "fuel",
+    notes: "Injector hold-down / line nuts on the high-pressure lines. Torque to tech-manual values — overtightening damages seats.",
+    models: "20B / 30B"
+  },
+  {
+    id: "036922",
+    num: "036922",
+    name: "GASKET, INJECTOR LEAK-OFF",
+    qty: "2+",
+    cat: "fastener",
+    system: "fuel",
+    notes: "Sealing gaskets at injector leak-off connections. Replace whenever the leak-off line is disturbed.",
+    models: "20B / 30B"
+  },
+  {
+    id: "R15T",
+    num: "Racor R15T / R15S",
+    name: "FUEL FILTER / WATER SEPARATOR (AFTERMARKET)",
+    qty: "1",
+    cat: "service",
+    system: "fuel",
+    notes: "Visible in the installation photos. Aftermarket primary filter/water separator — not original Westerbeke stock (stock primary is often 032974). Drain the bowl regularly.",
+    models: "Aftermarket"
+  },
+  {
+    id: "030210",
+    num: "030210",
+    name: "FILTER, FUEL ASSEMBLY (STOCK)",
+    qty: "1",
+    cat: "service",
+    system: "fuel",
+    notes: "Original Westerbeke secondary fuel-filter assembly. Body was 030211; element 030200; cup 030199.",
+    models: "20B / 30B"
+  },
+  {
+    id: "030200",
+    num: "030200",
+    name: "ELEMENT, FUEL FILTER",
+    qty: "1",
+    cat: "service",
+    system: "fuel",
+    notes: "Replaceable element for stock secondary filter. Change every 100–250 hours or annually.",
+    models: "20B / 30B"
+  },
+  {
+    id: "039275",
+    num: "039275",
+    name: "PUMP, FUEL LIFT 12VDC",
+    qty: "1",
+    cat: "fuel",
+    system: "fuel",
+    notes: "Electric lift pump feeding the secondary filter / injection pump. Common failure when the engine dies as if out of fuel.",
+    models: "Later / optional square-body style"
+  },
+
+  // —— FUEL BANJO / WASHER HARDWARE (official) ——
+  {
+    id: "037105",
+    num: "037105",
+    name: "WASHER, BANJO",
+    qty: "2",
+    cat: "fastener",
+    system: "fuel",
+    notes: "Banjo crush washers in the fuel-return / injection-pump banjo stack (Pub #037115 fuel group). Single-use — replace any time a banjo is opened.",
+    models: "20B / 30B",
+    service: "Never reuse a flattened banjo washer."
+  },
+  {
+    id: "030289",
+    num: "030289",
+    name: "WASHER, BANJO M8",
+    qty: "AR (often ×2–3)",
+    cat: "fastener",
+    system: "fuel",
+    notes: "M8 banjo washer used on smaller fuel banjo bolts (injection-pump and return fittings).",
+    models: "20B / 30B",
+    service: "Crush type — replace on every open."
+  },
+  {
+    id: "030291",
+    num: "030291",
+    name: "WASHER, BANJO M14",
+    qty: "AR (often ×4)",
+    cat: "fastener",
+    system: "fuel",
+    notes: "M14 banjo washers used on larger fuel banjo fittings (filter / pump side).",
+    models: "20B / 30B",
+    service: "Crush type — replace on every open."
+  },
+  {
+    id: "037104",
+    num: "037104",
+    name: "WASHER, BANJO",
+    qty: "1",
+    cat: "fastener",
+    system: "fuel",
+    notes: "Banjo washer paired with bleed / banjo bolts at the injection pump (refs 53–55 in fuel group).",
+    models: "20B / 30B"
+  },
+  {
+    id: "037110",
+    num: "037110",
+    name: "BOLT, BLEED",
+    qty: "1",
+    cat: "fastener",
+    system: "fuel",
+    notes: "Bleed bolt on the injection-pump / fuel hardware stack. Used when purging air after filter or hose service.",
+    models: "20B / 30B"
+  },
+  {
+    id: "037111",
+    num: "037111",
+    name: "BOLT, BANJO",
+    qty: "1",
+    cat: "fastener",
+    system: "fuel",
+    notes: "Banjo bolt at the injection-pump return / fuel fittings. Always install with new banjo washers.",
+    models: "20B / 30B"
+  },
+  {
+    id: "016988",
+    num: "016988",
+    name: "BOLT, BANJO M8",
+    qty: "1+",
+    cat: "fastener",
+    system: "fuel",
+    notes: "M8 banjo bolt used with 030289 washers on fuel-return fittings.",
+    models: "20B / 30B"
+  },
+  {
+    id: "024984",
+    num: "024984",
+    name: "BOLT, BANJO",
+    qty: "2",
+    cat: "fastener",
+    system: "fuel",
+    notes: "Banjo bolts in the secondary-filter / lift-pump fuel path.",
+    models: "20B / 30B"
+  },
+
+  // —— COOLING HOSES (official cooling group) ——
+  {
+    id: "037157",
+    num: "037157",
+    name: "HOSE, SEA PUMP TO EXCHANGER",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "Raw-water hose from the sea-water pump to the heat exchanger. Inspect for soft spots and chafe. Clamped with 011386 size-12 clamps.",
+    models: "20B cooling group"
+  },
+  {
+    id: "037383",
+    num: "037383",
+    name: "HOSE, THERMOSTAT TO MANIFOLD",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "Freshwater hose linking the thermostat housing to the exhaust manifold water jacket. Clamped with 011405 size-16.",
+    models: "20B / 30B"
+  },
+  {
+    id: "037506",
+    num: "037506",
+    name: "HOSE, FRESH WATER PUMP TO HEAT EXCHANGER",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "Closed-loop hose from the fresh-water circulating pump to the heat exchanger.",
+    models: "20B / 30B"
+  },
+  {
+    id: "036654",
+    num: "036654",
+    name: "HOSE, FLOW CONTROLLER RETURN BEND 3/4\"",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "¾″ return-bend hose at the flow controller. Uses size-16 clamps (011405).",
+    models: "20B cooling group"
+  },
+  {
+    id: "036556",
+    num: "036556",
+    name: "HOSE, FLOW CONTROL",
+    qty: "2",
+    cat: "hose",
+    system: "cooling",
+    notes: "Flow-control hoses in the freshwater circuit. Larger ends use size-20 clamps (021878).",
+    models: "20B cooling group"
+  },
+  {
+    id: "036947",
+    num: "036947",
+    name: "LINE, THERMOSTAT BY-PASS",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "Thermostat bypass line (formed tube / short hose depending on revision).",
+    models: "12C / 20B / 30B"
+  },
+  {
+    id: "045041",
+    num: "045041",
+    name: "KIT, HOSES 20B",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "Factory hose kit for the 20B cooling package. Prefer the kit when replacing multiple aged hoses at once.",
+    models: "20B"
+  },
+  {
+    id: "045042",
+    num: "045042",
+    name: "KIT, HOSES 30B/C",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "Factory hose kit for the 30B / 30C cooling package.",
+    models: "30B / 30C"
+  },
+  {
+    id: "COOLANT-HOSES",
+    num: "—",
+    name: "COOLANT BOTTLE HOSES",
+    qty: "AR",
+    cat: "hose",
+    system: "cooling",
+    notes: "Small hoses between the expansion/overflow bottle and the closed cooling circuit. Visible left of the Racor in the photos. Check for brittleness and secure clamps.",
+    models: "Common"
+  },
+  {
+    id: "033691",
+    num: "033691",
+    name: "HOSE, SUMP DRAIN",
+    qty: "1",
+    cat: "hose",
+    system: "service",
+    notes: "Oil sump drain hose (longer 10.75\" style on some books). Alternate 033056 (7.63\") and V-drive 034746 exist. Secured at the pan with banjo bolt 036819 + washers 036493×2.",
+    models: "20B / 30B"
+  },
+  {
+    id: "037154",
+    num: "037154",
+    name: "HOSE, TRANSMISSION SEA WATER",
+    qty: "2",
+    cat: "hose",
+    system: "cooling",
+    notes: "Raw-water hoses to/from the transmission cooler. Secured with four size-16 clamps (011405).",
+    models: "With marine gear cooler"
+  },
+  {
+    id: "EXHAUST",
+    num: "—",
+    name: "WET EXHAUST HOSE & ELBOW",
+    qty: "1",
+    cat: "hose",
+    system: "cooling",
+    notes: "Water-injected exhaust hose after the elbow. Must stay cool. Inspect for carbon, collapse, and burned sections. Adapters 033340/41/42 + clamps at elbow and muffler.",
+    models: "Marine"
+  },
+
+  // —— CLAMPS (official sizes) ——
+  {
+    id: "011386",
+    num: "011386",
+    name: "CLAMP, HOSE SIZE 12",
+    qty: "AR (often ×4+)",
+    cat: "clamp",
+    system: "cooling",
+    notes: "Size-12 clamp: sea-pump hose, flow-controller small ends, and other smaller cooling lines. Carry spares.",
+    models: "20B / 30B"
+  },
+  {
+    id: "011405",
+    num: "011405",
+    name: "CLAMP, HOSE SIZE 16",
+    qty: "AR (often ×6–10)",
+    cat: "clamp",
+    system: "cooling",
+    notes: "Workhorse size-16 clamp on thermostat, manifold, heat-exchanger, and transmission-cooler hoses. Most common cooling clamp on this family.",
+    models: "20B / 30B"
+  },
+  {
+    id: "011405-EX",
+    num: "011405",
+    name: "CLAMP, HOSE SIZE 16 (EXHAUST / COOLER)",
+    qty: "AR",
+    cat: "clamp",
+    system: "cooling",
+    notes: "Same 011405 used on wet-exhaust and transmission cooler connections. Inspect for rusted bands and stripped screws.",
+    models: "Marine"
+  },
+  {
+    id: "021878",
+    num: "021878",
+    name: "CLAMP, HOSE SIZE 20",
+    qty: "AR (often ×2)",
+    cat: "clamp",
+    system: "cooling",
+    notes: "Larger size-20 clamp for bigger cooling hoses (flow-control circuit).",
+    models: "20B cooling group"
+  },
+  {
+    id: "024906",
+    num: "024906",
+    name: "CLAMP, HOSE (MINI / GENERAL)",
+    qty: "AR",
+    cat: "clamp",
+    system: "fuel",
+    notes: "Pub #037115 lists 024906 as hose clamp (including mini size 04 on fuel lines). Used on small fuel hoses and general AR applications.",
+    models: "20B / 30B"
+  },
+
+  // —— NUTS / WASHERS / STUDS (cooling + block + fuel) ——
+  {
+    id: "MANIFOLD-HW",
+    num: "015830 + 018242 + 031787 + 031786",
+    name: "EXHAUST MANIFOLD HARDWARE SET",
+    qty: "Studs ×4, Nuts ×4, Flat ×4, Lock ×4 typical",
+    cat: "fastener",
+    system: "cooling",
+    notes: "Manifold to head: stud M8×25 (015830), nut M8 DIN 934 (018242), flat washer M8 DIN 125 (031787), lockwasher M8 DIN 127 (031786). Torque to tech-manual values. Replace crushed lockwashers.",
+    models: "20B / 30B",
+    service: "Always use flat + lock under the nut. Do not reuse stretched studs."
+  },
+  {
+    id: "015830",
+    num: "015830",
+    name: "STUD, M8 × 25 DIN 939",
+    qty: "4+ (manifold); also HEX mounts",
+    cat: "fastener",
+    system: "cooling",
+    notes: "M8 stud used on the exhaust manifold and some heat-exchanger mounts. Seat fully in the head before installing gasket and manifold.",
+    models: "20B / 30B"
+  },
+  {
+    id: "018242",
+    num: "018242",
+    name: "NUT, M8 DIN 934",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "Standard M8 hex nut. Manifold studs, heat-exchanger mounts, fuel-filter brackets, alternator strap.",
+    models: "Common metric"
+  },
+  {
+    id: "031787",
+    num: "031787",
+    name: "WASHER, M8 DIN 125 (FLAT)",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "Flat washer under M8 nuts and under some bolt heads. Distributes load on aluminum / painted surfaces.",
+    models: "Common metric"
+  },
+  {
+    id: "031786",
+    num: "031786",
+    name: "LOCKWASHER, M8 DIN 127",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "Split lockwasher for M8. Replace if flattened — a reused lockwasher does not lock.",
+    models: "Common metric"
+  },
+  {
+    id: "031784",
+    num: "031784",
+    name: "WASHER, M6 DIN 125 (FLAT)",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "Flat washer for M6 fasteners on pumps, covers, small brackets, and sump hardware.",
+    models: "Common metric"
+  },
+  {
+    id: "031783",
+    num: "031783",
+    name: "LOCKWASHER, M6 DIN 127",
+    qty: "AR (14–18 on sump alone)",
+    cat: "fastener",
+    system: "service",
+    notes: "M6 lockwasher. Sump pan uses many (with M6×12 capscrews 031825). Also on fresh-water pump, covers, and brackets.",
+    models: "Common metric"
+  },
+  {
+    id: "018804",
+    num: "018804",
+    name: "CAPSCREW, M6 × 20 DIN 933",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "Common short M6 bolt for pumps, small covers, fuel-filter body, and brackets. Often paired with 031783 lockwasher.",
+    models: "Common metric"
+  },
+  {
+    id: "031825",
+    num: "031825",
+    name: "CAPSCREW, M6 × 12 DIN 933",
+    qty: "14–18 (sump typical)",
+    cat: "fastener",
+    system: "service",
+    notes: "Short M6 bolts for the oil pan / sump. Always use new lockwashers (031783).",
+    models: "20B / 30B"
+  },
+  {
+    id: "015887",
+    num: "015887",
+    name: "NUT, M10 DIN 934",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "M10 hex nut used on back-end / flywheel-housing and mount hardware.",
+    models: "Common metric"
+  },
+  {
+    id: "031789",
+    num: "031789",
+    name: "WASHER, M10 DIN 125 (FLAT)",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "Flat washer for M10 fasteners (transmission mounts, back plate, cooler brackets).",
+    models: "Common metric"
+  },
+  {
+    id: "019262",
+    num: "019262",
+    name: "LOCKWASHER, M10 DIN 127",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "M10 split lockwasher. Used extensively on flywheel bolts, damper screws, and M10 capscrews.",
+    models: "Common metric"
+  },
+  {
+    id: "037162",
+    num: "037162",
+    name: "BANJO WASHER, M16",
+    qty: "1+",
+    cat: "fastener",
+    system: "cooling",
+    notes: "Copper/aluminum crush washer for M16 banjo fittings (thermostat / cooling circuit, also appears with temp switch hardware). Replace any time a banjo is opened.",
+    models: "20B / 30B",
+    service: "Never reuse a flattened banjo washer."
+  },
+  {
+    id: "036493",
+    num: "036493",
+    name: "WASHER, SUMP DRAIN BANJO",
+    qty: "2",
+    cat: "fastener",
+    system: "service",
+    notes: "Crush washers for the oil-sump drain banjo bolt (036819). Always replace both when servicing the drain hose.",
+    models: "20B / 30B"
+  },
+  {
+    id: "036819",
+    num: "036819",
+    name: "BOLT, BANJO — SUMP DRAIN",
+    qty: "1",
+    cat: "fastener",
+    system: "service",
+    notes: "Banjo bolt (M18×1.5 style in some listings) that seals the sump drain hose to the oil pan. Use two 036493 washers.",
+    models: "20B / 30B"
+  },
+  {
+    id: "037353",
+    num: "037353",
+    name: "NUT, M12 SELF-LOCKING DIN 985",
+    qty: "AR (mount isolators)",
+    cat: "fastener",
+    system: "service",
+    notes: "Nylon-insert locknut for engine isolator studs (M12). Do not reuse if the nylon is worn.",
+    models: "With isolator mounts"
+  },
+  {
+    id: "031792",
+    num: "031792",
+    name: "LOCKWASHER, M12 DIN 127",
+    qty: "AR",
+    cat: "fastener",
+    system: "service",
+    notes: "M12 lockwasher for larger mount and back-end hardware.",
+    models: "Common metric"
+  },
+
+  // —— MAJOR ASSEMBLIES (context) ——
+  {
+    id: "MANIFOLD",
+    num: "037311",
+    name: "EXHAUST MANIFOLD (FRESHWATER COOLED)",
+    qty: "1",
+    cat: "cooling",
+    system: "cooling",
+    notes: "Water-jacketed manifold (037311 typical). Red paint peels with heat cycles — cosmetic until it hides a weep. Mounted with M8 studs/nuts/washers (see MANIFOLD-HW).",
+    models: "20B / 30B"
+  },
+  {
+    id: "COOLANT",
+    num: "—",
+    name: "COOLANT OVERFLOW / EXPANSION BOTTLE",
+    qty: "1",
+    cat: "cooling",
+    system: "cooling",
+    notes: "Clear reservoir with black cap, left of the filter in the photos. Small hoses to the closed system need their own clamps.",
+    models: "Common"
+  },
+  {
+    id: "THROTTLE",
+    num: "—",
+    name: "THROTTLE / GOVERNOR LINKAGE",
+    qty: "1",
+    cat: "service",
+    system: "service",
+    notes: "Ball-joint linkage visible in the photos. Keep joints free; binding feels like a stuck throttle at the helm.",
+    models: "20B / 30B"
+  },
+  {
+    id: "036918",
+    num: "036918",
+    name: "FILTER, LUBE OIL",
+    qty: "1",
+    cat: "service",
+    system: "service",
+    notes: "Spin-on oil filter. Change with every oil service. Pre-fill when possible.",
+    models: "Common Westerbeke"
+  },
+  {
+    id: "024922",
+    num: "024922",
+    name: "BRACKET, SUMP DRAIN HOSE",
+    qty: "1",
+    cat: "service",
+    system: "service",
+    notes: "Holds the sump drain hose. Check that the hose is captive and the cap (024905) is present.",
+    models: "20B / 30B"
+  },
+  {
+    id: "024905",
+    num: "024905",
+    name: "CAP, SUMP DRAIN HOSE",
+    qty: "1",
+    cat: "service",
+    system: "service",
+    notes: "End cap for the sump drain hose. Missing cap = oil on the bilge.",
+    models: "20B / 30B"
+  },
+  {
+    id: "TRANSMISSION",
+    num: "—",
+    name: "MARINE GEAR / COOLER HOSES",
+    qty: "1 assembly",
+    cat: "cooling",
+    system: "cooling",
+    notes: "Reduction gear at the back of the engine. Cooler uses two 037154 sea-water hoses and four 011405 clamps. Gear oil is separate from engine oil.",
+    models: "Hurth / JS / similar"
+  },
+  {
+    id: "037121",
+    num: "037121",
+    name: "KIT, HARDWARE 12C / 20B / 30B",
+    qty: "1",
+    cat: "fastener",
+    system: "service",
+    notes: "Factory hardware kit for this engine family (miscellaneous fasteners). Useful when refreshing many lockwashers and small bolts at once.",
+    models: "12C / 20B / 30B"
+  }
+];
+
+let activeCatlet activeCat = "all";
+
+function catClass(cat) {
+  if (cat === "hose") return "hose-item";
+  if (cat === "clamp") return "clamp-item";
+  if (cat === "fastener") return "fastener-item";
+  return "";
+}
+
+function renderParts() {
+  const list = document.getElementById("partsList");
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  const filtered = parts.filter(p => {
+    const catOk =
+      activeCat === "all" ||
+      p.cat === activeCat ||
+      (activeCat === "fuel" && p.system === "fuel") ||
+      (activeCat === "cooling" && p.system === "cooling") ||
+      (activeCat === "service" && (p.system === "service" || p.cat === "service"));
+    if (!catOk) return false;
+    if (!q) return true;
+    return (
+      p.num.toLowerCase().includes(q) ||
+      p.name.toLowerCase().includes(q) ||
+      (p.notes && p.notes.toLowerCase().includes(q)) ||
+      (p.service && p.service.toLowerCase().includes(q))
+    );
+  });
+
+  document.getElementById("partsCount").textContent = filtered.length + " items";
+
+  list.innerHTML = filtered.map(p => `
+    <div class="part-item ${p.highlight ? "highlight-item" : ""} ${catClass(p.cat)}" data-id="${p.id}" onclick="showPart('${p.id}')">
+      <div class="part-num">${p.num}${p.highlight ? ' <span class="badge">FOCUS</span>' : ""}<span class="part-cat">${p.cat}</span></div>
+      <div class="part-name">${p.name}</div>
+      <div class="part-notes">Qty: ${p.qty} · ${p.models}</div>
+    </div>
+  `).join("") || `<div class="part-item"><div class="part-notes">No parts match that filter.</div></div>`;
+}
+
+function filterParts() {
+  renderParts();
+}
+
+function showPart(id) {
+  const p = parts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById("modalTitle").textContent = p.num + " — " + p.name;
+  document.getElementById("modalBody").innerHTML = `
+    <p><strong>Part number:</strong> <span class="tag">${p.num}</span></p>
+    <p><strong>Description:</strong> ${p.name}</p>
+    <p><strong>Quantity:</strong> ${p.qty}</p>
+    <p><strong>Category:</strong> ${p.cat} · <strong>System:</strong> ${p.system || "—"}</p>
+    <p><strong>Models:</strong> ${p.models}</p>
+    <p style="margin-top:0.75rem;"><strong>Notes:</strong><br>${p.notes}</p>
+    ${p.service ? `<p style="margin-top:0.75rem;padding:0.75rem;background:#f5f5f5;border-radius:6px;"><strong>Service tip:</strong> ${p.service}</p>` : ""}
+    ${p.highlight ? `<p style="margin-top:1rem;padding:0.75rem;background:#e8fff3;border-radius:6px;"><strong>★ Focus part on this installation.</strong></p>` : ""}
+  `;
+  document.getElementById("modal").classList.add("open");
+  document.querySelectorAll(".hotspot").forEach(h => h.classList.remove("active"));
+  document.querySelectorAll(`.hotspot[data-part="${id}"]`).forEach(h => h.classList.add("active"));
+  document.querySelectorAll(".part-item").forEach(el => {
+    el.classList.toggle("active", el.dataset.id === id);
+  });
+}
+
+function closeModal() {
+  document.getElementById("modal").classList.remove("open");
+}
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const view = tab.dataset.tab;
+    document.getElementById("view-front").style.display = view === "front" ? "block" : "none";
+    document.getElementById("view-side").style.display = view === "side" ? "block" : "none";
+  });
+});
+
+document.querySelectorAll(".hotspot").forEach(hs => {
+  hs.addEventListener("click", () => showPart(hs.dataset.part));
+});
+
+document.getElementById("modal").addEventListener("click", e => {
+  if (e.target.id === "modal") closeModal();
+});
+
+document.querySelectorAll(".chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    activeCat = chip.dataset.cat;
+    filterParts();
+  });
+});
+
+renderParts();
+</script>
+</body>
+</html>

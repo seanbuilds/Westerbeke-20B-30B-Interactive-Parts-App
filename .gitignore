@@ -1,0 +1,9 @@
+node_modules
+.vercel
+dist
+.nitro
+.output
+screenshots
+.env
+.env.*
+!.env.example
