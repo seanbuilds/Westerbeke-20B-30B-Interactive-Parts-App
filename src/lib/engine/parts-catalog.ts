@@ -472,8 +472,8 @@ export const PARTS: EnginePart[] = [
     group: "electrical",
     models: "12V marine isolated ground",
     notes: "Mounted on the Starboard front cylinder head bracket.",
-    rest: [-0.44, 0.16, 0.62],
-    explode: [-0.92, 0.14, 0.88],
+    rest: [0.44, 0.16, 0.62],
+    explode: [0.92, 0.14, 0.88],
     category: "assembly",
   },
   {
@@ -485,8 +485,8 @@ export const PARTS: EnginePart[] = [
     group: "electrical",
     models: "20B / 30B",
     notes: "Bracket bolting alternator to cylinder head.",
-    rest: [-0.38, 0.18, 0.52],
-    explode: [-0.78, 0.24, 0.75],
+    rest: [0.38, 0.18, 0.52],
+    explode: [0.78, 0.24, 0.75],
     category: "assembly",
   },
   {
