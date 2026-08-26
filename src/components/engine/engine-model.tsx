@@ -803,7 +803,7 @@ export function EngineModel() {
       </PartNode>
 
       <PartNode id="leak-off-rail">
-        <mesh position={[0, 0, 0]}>
+        <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.006, 0.006, 0.52, 8]} />
           <Mat color={CHROME} metalness={0.85} roughness={0.2} />
         </mesh>
@@ -992,11 +992,18 @@ export function EngineModel() {
       </PartNode>
 
       <PartNode id="oil-dipstick">
-        <mesh position={[0, -0.05, 0]} rotation={[0, 0, 0.2]}>
-          <cylinderGeometry args={[0.005, 0.005, 0.25, 8]} />
-          <Mat color={CHROME} metalness={0.8} roughness={0.2} />
+        {/* Steel Guide Tube insert */}
+        <mesh position={[0, -0.06, 0]} rotation={[0, 0, 0.15]}>
+          <cylinderGeometry args={[0.007, 0.007, 0.20, 8]} />
+          <Mat color={IRON} metalness={0.7} roughness={0.3} />
         </mesh>
-        <mesh position={[0.02, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        {/* Dipstick Blade */}
+        <mesh position={[0.01, 0.04, 0]} rotation={[0, 0, 0.15]}>
+          <cylinderGeometry args={[0.004, 0.004, 0.12, 8]} />
+          <Mat color={CHROME} metalness={0.85} roughness={0.2} />
+        </mesh>
+        {/* Yellow Pull Ring Loop */}
+        <mesh position={[0.02, 0.11, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[0.016, 0.004, 8, 16]} />
           <Mat color="#e5a015" roughness={0.4} metalness={0.1} />
         </mesh>
@@ -1330,13 +1337,20 @@ export function EngineModel() {
 
       {/* Throttle speed control lever on Port side */}
       <PartNode id="throttle">
-        <mesh rotation={[0, 0, -0.4]}>
-          <cylinderGeometry args={[0.01, 0.01, 0.28, 10]} />
+        {/* Base Pivot Boss */}
+        <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.015, 0.015, 0.03, 12]} />
+          <Mat color={IRON} metalness={0.7} roughness={0.3} />
+        </mesh>
+        {/* Speed Control Arm */}
+        <mesh position={[-0.01, 0.08, 0]} rotation={[0, 0, -0.3]}>
+          <cylinderGeometry args={[0.007, 0.007, 0.18, 10]} />
           <Mat color={CHROME} metalness={0.85} roughness={0.25} />
         </mesh>
-        <mesh position={[-0.02, 0.12, 0]}>
-          <sphereGeometry args={[0.018, 12, 12]} />
-          <Mat color={IRON} />
+        {/* Cable Connection Swivel Knob */}
+        <mesh position={[-0.04, 0.16, 0]}>
+          <sphereGeometry args={[0.014, 12, 12]} />
+          <Mat color={BRASS} metalness={0.8} roughness={0.25} />
         </mesh>
       </PartNode>
 
