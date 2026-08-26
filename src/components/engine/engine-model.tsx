@@ -290,14 +290,14 @@ export function EngineModel() {
   );
 
   // ===================== STARBOARD COOLING HOSES (X > 0) =====================
-  // Sea pump top outlet [-0.26, 0.01, 0.72] around front timing cover over to heat exchanger front inlet [0.46, 0.55, 0.41]
+  // Sea pump top outlet [-0.26, -0.01, 0.72] forward around front timing cover/belt at Z = 0.82 over to heat exchanger front inlet [0.46, 0.55, 0.41]
   const hoseSeaToHeatex = useMemo(
     () =>
       tube([
-        [-0.26, 0.01, 0.72],
-        [-0.15, 0.18, 0.76],
-        [0.10, 0.36, 0.76],
-        [0.34, 0.48, 0.62],
+        [-0.26, -0.01, 0.72],
+        [-0.22, 0.15, 0.82],
+        [0.06, 0.36, 0.84],
+        [0.34, 0.48, 0.68],
         [0.46, 0.55, 0.41],
       ], 0.015),
     [],
@@ -394,22 +394,27 @@ export function EngineModel() {
     [],
   );
 
-  // 6. Realistic 3-Point V-Belt Path around Crank Pulley [0, 0.02, 0.72], Water Pump Pulley [0.06, 0.30, 0.72], and Alternator Pulley [0.44, 0.16, 0.72] on Starboard
+  // 6. Realistic 3-Point V-Belt Path tightly tangent around:
+  // - Crank Pulley at [0, 0.02, 0.72] (radius ~0.14)
+  // - Circulating Water Pump Pulley at [0.06, 0.30, 0.72] (radius ~0.08)
+  // - Alternator Pulley at [0.44, 0.16, 0.72] (radius ~0.055)
   const vBeltLoop = useMemo(
     () =>
       tube(
         [
+          // Bottom of crank pulley
           [0.0, -0.12, 0.72],
           [-0.14, 0.02, 0.72],
-          [-0.14, 0.22, 0.72],
-          [-0.04, 0.34, 0.72],
+          // Upward run to water pump pulley
+          [-0.02, 0.30, 0.72],
           [0.06, 0.38, 0.72],
-          [0.18, 0.34, 0.72],
-          [0.32, 0.26, 0.72],
-          [0.44, 0.20, 0.72],
-          [0.48, 0.16, 0.72],
-          [0.46, 0.11, 0.72],
-          [0.28, 0.04, 0.72],
+          [0.14, 0.30, 0.72],
+          // Slanted run across to alternator pulley
+          [0.38, 0.21, 0.72],
+          [0.49, 0.16, 0.72],
+          [0.44, 0.10, 0.72],
+          // Return run from alternator back to bottom-right of crank pulley
+          [0.26, 0.01, 0.72],
           [0.14, -0.04, 0.72],
         ],
         0.009,
