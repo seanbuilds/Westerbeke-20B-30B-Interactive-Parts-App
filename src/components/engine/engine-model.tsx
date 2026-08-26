@@ -290,14 +290,17 @@ export function EngineModel() {
   );
 
   // ===================== STARBOARD COOLING HOSES (X > 0) =====================
-  // Sea pump top outlet [-0.26, -0.01, 0.72] forward around front timing cover/belt at Z = 0.82 over to heat exchanger front inlet [0.46, 0.55, 0.41]
+  // Sea pump top outlet [-0.26, -0.01, 0.72] routed cleanly downward and underneath the crank pulley/belt at Y = -0.22, Z = 0.76, then up on Starboard to heat exchanger front inlet [0.46, 0.55, 0.41]
   const hoseSeaToHeatex = useMemo(
     () =>
       tube([
         [-0.26, -0.01, 0.72],
-        [-0.22, 0.15, 0.82],
-        [0.06, 0.36, 0.84],
-        [0.34, 0.48, 0.68],
+        [-0.24, -0.15, 0.74],
+        [-0.10, -0.22, 0.76],
+        [0.12, -0.22, 0.76],
+        [0.32, -0.10, 0.74],
+        [0.44, 0.15, 0.68],
+        [0.48, 0.38, 0.56],
         [0.46, 0.55, 0.41],
       ], 0.015),
     [],
